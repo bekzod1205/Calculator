@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -37,6 +38,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private var isok = false
     private var symbol = false
     private var number = false
+    private var equal_status = false
+    private var limit = 0
+    private var back_status = false
+
 
     @SuppressLint("MissingInflatedId", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,6 +67,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         equal = findViewById(R.id.equal)
         answer = findViewById(R.id.answer)
         backspace = findViewById(R.id.backspace)
+        percent = findViewById(R.id.percent)
         one.setOnClickListener(this)
         two.setOnClickListener(this)
         three.setOnClickListener(this)
@@ -71,17 +77,26 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         seven.setOnClickListener(this)
         eight.setOnClickListener(this)
         nine.setOnClickListener(this)
+        zero.setOnClickListener(this)
 
         backspace.setOnClickListener {
-            if (operand.text != "0") {
+            if (operand.text != "0" && !equal_status) {
                 operand.text = operand.text.substring(0, operand.text.length - 1)
-                answer.text = "=" + calculate(toArray(operand.text.toString()))
+                var st = calculate(toArray(operand.text.toString()))
+                answer.text = "=" + st.substring(1, st.length - 1)
             }
-            if (operand.text.isEmpty()) operand.text = "0"
+            if (operand.text.isEmpty() && !equal_status) operand.text = "0"
+            if (operand.text[operand.text.length - 1] != '+' || operand.text[operand.text.length - 1] != '-' || operand.text[operand.text.length - 1] != '*' || operand.text[operand.text.length - 1] != '÷')
+                back_status = true
         }
 
         equal.setOnClickListener {
-            answer.text = "=" + calculate(toArray(operand.text.toString()))
+            var str = calculate(toArray(operand.text.toString()))
+            answer.text = "=" + str.substring(1, str.length - 1)
+            operand.textSize = 20f
+            answer.textSize = 30f
+            answer.setTextColor(Color.parseColor("#FFFFFF"))
+            equal_status = true
         }
         point.setOnClickListener {
             if ((!isok && number && symbol) || operand.text.toString() == "0") {
@@ -94,6 +109,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             answer.text = "=0"
             isok = false
             symbol = false
+            equal_status = false
+            operand.textSize = 30f
+            answer.textSize = 20f
+            answer.setTextColor(Color.parseColor("#4E505F"))
         }
         plus.setOnClickListener {
             symbol_onClick(plus.text.toString())
@@ -113,12 +132,17 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     @SuppressLint("SetTextI18n")
     override fun onClick(view: View) {
         var btn = findViewById<Button>(view.id)
-        if (operand.text != ("0")) {
-            operand.text = operand.text.toString() + btn.text
-        } else operand.text = btn.text
+        if (limit <= 15) {
+            if (operand.text != ("0")) {
+                operand.text = operand.text.toString() + btn.text
+            } else operand.text = btn.text
+        }
         symbol = true
         number = true
-        answer.text = "=" + calculate(toArray(operand.text.toString()))
+        equal_status = false
+        limit++
+        var str1 = calculate(toArray(operand.text.toString()))
+        answer.text = "=" + str1.substring(1, str1.length - 1)
     }
 
     @SuppressLint("SetTextI18n")
@@ -127,15 +151,17 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             operand.text = operand.text.toString() + simbol
             symbol = false
         } else {
-            if (operand.text != ("0")) {
+            if (operand.text != ("0") && !back_status) {
                 operand.text = operand.text.dropLast(1)
                 operand.text = operand.text.toString() + simbol
             } else {
+                back_status = false
                 operand.text = operand.text.toString() + simbol
             }
         }
         number = false
         isok = false
+        limit = 0
     }
 
     fun toArray(str: String): MutableList<Any> {
@@ -230,4 +256,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         res = arr.toString()
         return res
     }
+
+
 }
