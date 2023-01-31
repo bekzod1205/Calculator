@@ -40,7 +40,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private var number = false
     private var equal_status = false
     private var limit = 0
-    private var back_status = false
 
 
     @SuppressLint("MissingInflatedId", "SetTextI18n")
@@ -86,8 +85,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 answer.text = "=" + st.substring(1, st.length - 1)
             }
             if (operand.text.isEmpty() && !equal_status) operand.text = "0"
-            if (operand.text[operand.text.length - 1] != '+' || operand.text[operand.text.length - 1] != '-' || operand.text[operand.text.length - 1] != '*' || operand.text[operand.text.length - 1] != '÷')
-                back_status = true
+            if (operand.text[operand.text.length - 1] != '+' || operand.text[operand.text.length - 1] != '-' || operand.text[operand.text.length - 1] != '*' || operand.text[operand.text.length - 1] != '÷') {
+                symbol = false
+
+            }
         }
 
         equal.setOnClickListener {
@@ -96,6 +97,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             operand.textSize = 20f
             answer.textSize = 30f
             answer.setTextColor(Color.parseColor("#FFFFFF"))
+            operand.setTextColor(Color.parseColor("#4E505F"))
             equal_status = true
         }
         point.setOnClickListener {
@@ -113,6 +115,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             operand.textSize = 30f
             answer.textSize = 20f
             answer.setTextColor(Color.parseColor("#4E505F"))
+            operand.setTextColor(Color.parseColor("#FFFFFF"))
         }
         plus.setOnClickListener {
             symbol_onClick(plus.text.toString())
@@ -151,11 +154,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             operand.text = operand.text.toString() + simbol
             symbol = false
         } else {
-            if (operand.text != ("0") && !back_status) {
+            if (operand.text != ("0")&&(operand.text[operand.text.length - 1] == '+' || operand.text[operand.text.length - 1] == '-' || operand.text[operand.text.length - 1] == '*' || operand.text[operand.text.length - 1] == '÷')) {
                 operand.text = operand.text.dropLast(1)
                 operand.text = operand.text.toString() + simbol
             } else {
-                back_status = false
                 operand.text = operand.text.toString() + simbol
             }
         }
